@@ -1,3 +1,7 @@
 hardhat.config.ts
 scripts
 test
+.npmignore
+.prettierignore
+.solhint.json
+tsconfig.json
