@@ -1,10 +1,10 @@
-// tests/CryptoDevsDAO.test.js
-const { expect } = require("chai");
-const { ethers } = require("hardhat");
+import { expect } from "chai";
+import { Contract } from "ethers";
+import { ethers } from "hardhat";
 
 describe("CryptoDevsDAO", function () {
-  let cryptoDevsDAO, nftMarketplace, cryptoDevsNFT;
-  let deployer, member1, member2;
+  let cryptoDevsDAO: Contract, nftMarketplace: Contract, cryptoDevsNFT: Contract;
+  let deployer: any, member1: any, member2: any;
 
   beforeEach(async function () {
     [deployer, member1, member2] = await ethers.getSigners();
@@ -34,10 +34,12 @@ describe("CryptoDevsDAO", function () {
       await cryptoDevsDAO.connect(member1).onERC721Received(member1.address, 1, "");
 
       expect(await cryptoDevsDAO.members(member1.address).lockedNFTs).to.have.lengthOf(1);
-    });
+      const member = await cryptoDevsDAO.members(member1.address);
+      expect(member.lockedNFTs).to.have.lengthOf(1);
 
-    it("Should not allow non-members to participate in proposals", async function () {
-      await expect(cryptoDevsDAO.connect(member2).createProposal(1, 0)).to.be.revertedWith("NOT_A_MEMBER");
+      it("Should not allow non-members to participate in proposals", async function () {
+        await expect(cryptoDevsDAO.connect(member2).createProposal(1, 0)).to.be.revertedWith("NOT_A_MEMBER");
+      });
     });
   });
 
@@ -57,7 +59,8 @@ describe("CryptoDevsDAO", function () {
       const proposalId = await cryptoDevsDAO.connect(member1).createProposal(1, 0);
       await cryptoDevsDAO.connect(member1).voteOnProposal(proposalId, 0);
 
-      expect(await cryptoDevsDAO.proposals(proposalId).forVotes).to.be.equal(1);
+      const proposal = await cryptoDevsDAO.proposals(proposalId);
+      expect(proposal.forVotes).to.be.equal(1);
     });
 
     it("Should execute proposals after deadline", async function () {
@@ -69,11 +72,12 @@ describe("CryptoDevsDAO", function () {
 
       // Fast forward to deadline
       await ethers.provider.send("evm_setNextBlockTimestamp", [Math.floor(Date.now() / 1000) + 86400]);
-      await ethers.provider.send("evm_mine");
+      await ethers.provider.send("evm_mine", []);
 
       await cryptoDevsDAO.executeProposal(proposalId);
 
-      // Check if proposal was executed successfully
+      const executedProposal = await cryptoDevsDAO.proposals(proposalId);
+      expect(executedProposal.executed).to.be.true;
       expect(await cryptoDevsDAO.proposals(proposalId).executed).to.be.true;
     });
   });
