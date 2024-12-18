@@ -1,17 +1,39 @@
 import * as dotenv from "dotenv";
-
 import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
 import "@nomiclabs/hardhat-waffle";
 import "@typechain/hardhat";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
+
+// Define interfaces for the task parameters
+interface NFTTaskArgs {
+  nftContract: string;
+}
+
+interface DAOTaskArgs {
+  daoContract: string;
+}
+
+interface NFTToDAOTaskArgs extends NFTTaskArgs {
+  daoContract: string;
+  tokenId: string;
+}
+
+interface ProposalTaskArgs extends DAOTaskArgs {
+  proposalId: string;
+}
+
+interface CreateProposalTaskArgs extends DAOTaskArgs {
+  forTokenId: string;
+}
 
 dotenv.config();
 
 task("mintFreeNFT", "Mint Free NFT from CryptoDevs NFT")
   .addParam("nftContract", "The NFT contract's address")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: NFTTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const NFTContract = await hre.ethers.getContractAt(
       "CryptoDevsNFT",
       args.nftContract
@@ -24,7 +46,7 @@ task("mintFreeNFT", "Mint Free NFT from CryptoDevs NFT")
 
 task("getNFTBalance", "Get the CryptoDevs NFT balance of your address")
   .addParam("nftContract", "The NFT contract's address")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: NFTTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const NFTContract = await hre.ethers.getContractAt(
       "CryptoDevsNFT",
       args.nftContract
@@ -40,7 +62,7 @@ task("sendNFTToDAO", "Send CryptoDev NFT to DAO")
   .addParam("nftContract", "The NFT contract's address")
   .addParam("daoContract", "The DAO contract's address")
   .addParam("tokenId", "The NFT token ID to send")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: NFTToDAOTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const NFTContract = await hre.ethers.getContractAt(
       "CryptoDevsNFT",
       args.nftContract
@@ -61,7 +83,7 @@ task("sendNFTToDAO", "Send CryptoDev NFT to DAO")
   });
 
 task("getETHBalance", "Get the ETH balance of your address").setAction(
-  async (args, hre) => {
+  async (_args: any, hre: HardhatRuntimeEnvironment) => {
     const signers = await hre.ethers.getSigners();
     const mySigner = signers[0];
     const balance = await mySigner.getBalance();
@@ -75,7 +97,7 @@ task("getETHBalance", "Get the ETH balance of your address").setAction(
 
 task("quitDAO", "Quit the DAO")
   .addParam("daoContract", "The DAO contract's address")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: DAOTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract
@@ -86,10 +108,10 @@ task("quitDAO", "Quit the DAO")
     console.log("Sucessfully quit the DAO!");
   });
 
-task("createProposalBuy", "Create a proposal in the DAO to buy a fake NFT")
+task("createProposalBuy", "Create a proposal in the DAO to buy a  NFT")
   .addParam("daoContract", "The DAO contract's address")
-  .addParam("forTokenId", "The fake token ID to buy from the fake marketplace")
-  .setAction(async (args, hre) => {
+  .addParam("forTokenId", "The  token ID to buy from the  marketplace")
+  .setAction(async (args: CreateProposalTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract
@@ -99,16 +121,15 @@ task("createProposalBuy", "Create a proposal in the DAO to buy a fake NFT")
     await txn.wait();
     const numProposals = await DAOContract.numProposals();
     console.log(
-      `Successfully created a BUY proposal for token ID ${
-        args.forTokenId
+      `Successfully created a BUY proposal for token ID ${args.forTokenId
       }: Proposal ID = ${numProposals.sub(1).toString()}`
     );
   });
 
-task("createProposalSell", "Create a proposal in the DAO to sell a fake NFT")
+task("createProposalSell", "Create a proposal in the DAO to sell a  NFT")
   .addParam("daoContract", "The DAO contract's address")
-  .addParam("forTokenId", "The fake token ID to sell from the fake marketplace")
-  .setAction(async (args, hre) => {
+  .addParam("forTokenId", "The  token ID to sell from the  marketplace")
+  .setAction(async (args: CreateProposalTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract
@@ -119,15 +140,14 @@ task("createProposalSell", "Create a proposal in the DAO to sell a fake NFT")
 
     const numProposals = await DAOContract.numProposals();
     console.log(
-      `Successfully created a SELL proposal for token ID ${
-        args.forTokenId
+      `Successfully created a SELL proposal for token ID ${args.forTokenId
       }: Proposal ID = ${numProposals.sub(1).toString()}`
     );
   });
 
 task("getDAOBalance", "Check the DAO's ETH treasury balance")
   .addParam("daoContract", "The DAO contract's address")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: DAOTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const signers = await hre.ethers.getSigners();
     const provider = signers[0].provider!;
     const balance = await provider.getBalance(args.daoContract);
@@ -140,7 +160,7 @@ task("getDAOBalance", "Check the DAO's ETH treasury balance")
 task("executeProposal", "Execute a proposal in the DAO")
   .addParam("daoContract", "The DAO contract's address")
   .addParam("proposalId", "The ID of the proposal to execute")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: ProposalTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract
@@ -154,7 +174,7 @@ task("executeProposal", "Execute a proposal in the DAO")
 task("voteYesOnProposal", "Vote YAY for a proposal in the DAO")
   .addParam("daoContract", "The DAO contract's address")
   .addParam("proposalId", "The ID of the proposal to vote on")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: ProposalTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract
@@ -168,7 +188,7 @@ task("voteYesOnProposal", "Vote YAY for a proposal in the DAO")
 task("voteNoOnProposal", "Vote NAY for a proposal in the DAO")
   .addParam("daoContract", "The DAO contract's address")
   .addParam("proposalId", "The ID of the proposal to vote on")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: ProposalTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract
@@ -182,7 +202,7 @@ task("voteNoOnProposal", "Vote NAY for a proposal in the DAO")
 task("getProposal", "Get proposal")
   .addParam("daoContract", "The DAO contract's address")
   .addParam("proposalId", "The ID of the proposal to vote on")
-  .setAction(async (args, hre) => {
+  .setAction(async (args: ProposalTaskArgs, hre: HardhatRuntimeEnvironment) => {
     const DAOContract = await hre.ethers.getContractAt(
       "CryptoDevsDAO",
       args.daoContract

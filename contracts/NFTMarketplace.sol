@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract FakeNFTMarketplace {
-    /// @dev Maintain a mapping of Fake TokenID to Owner addresses
+contract NFTMarketplace {
+    /// @dev Maintain a mapping of  TokenID to Owner addresses
     mapping(uint256 => address) public tokens;
-    /// @dev Set the purchase price for each Fake NFT
+    /// @dev Set the purchase price for each  NFT
     uint256 public constant nftPurchasePrice = 0.001 ether;
     uint256 public constant nftSalePrice = 0.002 ether;
 
     constructor() payable {}
 
     /// @dev purchase() accepts ETH and marks the owner of the given `tokenId` as the caller address
-    /// @param _tokenId - the fake NFT token Id to purchase
+    /// @param _tokenId - the  NFT token Id to purchase
     function purchase(uint256 _tokenId) external payable {
         require(msg.value == nftPurchasePrice, "NOT_ENOUGH_ETH_SUPPLIED");
         require(tokens[_tokenId] == address(0), "NOT_FOR_SALE");
@@ -19,7 +19,7 @@ contract FakeNFTMarketplace {
     }
 
     /// @dev sell() pays the NFT owner `nftSalePrice` ETH and takes`tokenId` ownership back
-    /// @param _tokenId the fake NFT token Id to sell back
+    /// @param _tokenId the  NFT token Id to sell back
     function sell(uint256 _tokenId) external {
         require(tokens[_tokenId] == msg.sender, "INVALID_OWNER");
         require(address(this).balance >= nftSalePrice, "NOT_ENOUGH_FUNDS");
@@ -36,5 +36,11 @@ contract FakeNFTMarketplace {
             return true;
         }
         return false;
+    }
+
+    /// @dev ownerOf() returns the owner of the given tokenId
+    /// @param _tokenId - the tokenId to check for
+    function ownerOf(uint256 _tokenId) external view returns (address) {
+        return tokens[_tokenId];
     }
 }
