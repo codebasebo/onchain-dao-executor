@@ -38,6 +38,7 @@ This project consists of three main smart contracts:
 ```bash
 npm install
 npx hardhat run scripts/deploy.ts
+```
 
 ## Technical Details
 ### Proposal Lifecycle
