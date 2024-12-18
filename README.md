@@ -42,15 +42,15 @@ npx hardhat run scripts/deploy.ts
 
 ## Technical Details
 ### Proposal Lifecycle
-Member creates proposal (Buy/Sell NFT)
-24 hour voting period starts
-Members vote with NFT-based voting power
-After deadline, anyone can trigger execution
-If passed, proposal executes automatically
+- Member creates proposal (Buy/Sell NFT)
+- 24 hour voting period starts
+- Members vote with NFT-based voting power
+- After deadline, anyone can trigger execution
+- If passed, proposal executes automatically
 
 ### Security Features
-Membership NFTs locked during voting
-Vote delegation not allowed
-One vote per NFT
-30 day minimum membership period
-Automatic treasury share calculation
+- Membership NFTs locked during voting
+- Vote delegation not allowed
+- One vote per NFT
+- 30 day minimum membership period
+- Automatic treasury share calculation
