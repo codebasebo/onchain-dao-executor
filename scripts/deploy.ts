@@ -10,11 +10,11 @@ async function main() {
   await cryptoDevsNFT.deployed();
   console.log("Deployed CryptoDevsNFT contract at address:", cryptoDevsNFT.address);
 
-  // Deploy the FakeNFTMarketplace contract
+  // Deploy the NFTMarketplace contract
   const NFTMarketplace = await ethers.getContractFactory("NFTMarketplace");
   const NftMarketplace = await NFTMarketplace.deploy();
   await NftMarketplace.deployed();
-  console.log("Deployed FakeNFTMarketplace at address:", NftMarketplace.address);
+  console.log("Deployed NFTMarketplace at address:", NftMarketplace.address);
 
   // Deploy the DAO Contract
   const CryptoDevsDAO = await ethers.getContractFactory("CryptoDevsDAO");
