@@ -9,3 +9,9 @@ typechain
 cache
 artifacts
 
+.eslintignore
+.eslintrc.js
+.npmignore
+.prettierignore
+.solhint.json
+tsconfig.json
